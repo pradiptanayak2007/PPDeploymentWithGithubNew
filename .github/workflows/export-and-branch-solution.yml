@@ -30,8 +30,7 @@ env:
   ENVIRONMENT_URL:  ${{vars.ENVIRONMENT_URL}} #'<ENVIRONMENTURL>'
   CLIENT_ID:  ${{vars.CLIENT_ID}} #'<APPID>'
   TENANT_ID:  ${{vars.TENANT_ID}} #'<TENANT ID>'
-permissions:
-  contents: write
+
 jobs:
   export-from-dev:
     runs-on: windows-latest
