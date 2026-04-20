@@ -1,7 +1,9 @@
 name: export-and-branch-solution
 # Export solution from DEV environment
 #  unpack it and prepare, commit and push a git branch with the changes
-
+permissions:
+  contents: write
+  pull-requests: write
 on:
   workflow_dispatch:
     inputs:
