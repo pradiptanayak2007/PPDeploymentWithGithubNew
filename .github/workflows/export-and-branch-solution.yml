@@ -27,7 +27,7 @@ on:
        default: solutions/
 env:
 #edit your values here
-  ENVIRONMENT_URL:  ${{vars.ENVIRONMENT_URL}} #'<ENVIRONMENTURL>'
+  ENVIRONMENT_URL:  ${{vars.DEV_ENVIRONMENT_URL}} #'<ENVIRONMENTURL>'
   CLIENT_ID:  ${{vars.CLIENT_ID}} #'<APPID>'
   TENANT_ID:  ${{vars.TENANT_ID}} #'<TENANT ID>'
 
