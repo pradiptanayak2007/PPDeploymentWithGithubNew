@@ -1,8 +1,8 @@
 {
   "EnvironmentVariables": [
     {
-      "SchemaName": "ms_OptionalLeave",
-      "Value": "200"
+      "SchemaName": "neu_BaseUrl",
+      "Value": "https://github.com/pradiptanayak2007"
     }
   ]
 }
