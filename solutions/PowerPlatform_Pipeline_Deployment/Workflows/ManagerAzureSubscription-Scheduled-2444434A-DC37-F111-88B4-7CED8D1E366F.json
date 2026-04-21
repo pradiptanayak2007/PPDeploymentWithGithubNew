@@ -1,0 +1,646 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_teams": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "neu_sharedteams_3de3f"
+        },
+        "api": {
+          "name": "shared_teams"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "Recurrence": {
+          "recurrence": {
+            "frequency": "Day",
+            "interval": 1,
+            "startTime": "2026-04-14T04:30:00Z"
+          },
+          "evaluatedRecurrence": {
+            "frequency": "Day",
+            "interval": 1,
+            "startTime": "2026-04-14T04:30:00Z"
+          },
+          "metadata": {
+            "operationMetadataId": "7046545e-f445-4a35-b373-9719a0d3e550"
+          },
+          "type": "Recurrence"
+        }
+      },
+      "actions": {
+        "Compose": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "e71848d0-c910-4e36-b4ca-9cab2a39f03d"
+          },
+          "type": "Compose",
+          "inputs": "Job Started"
+        },
+        "Get-All-Subscriptions": {
+          "actions": {
+            "HTTP-Get-Token": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "cc2acdc8-d839-4a5d-99f3-c6997cad722e"
+              },
+              "type": "Http",
+              "inputs": {
+                "method": "POST",
+                "uri": "https://login.microsoftonline.com/687f51c3-0c5d-4905-84f8-97c683a5b9d1/oauth2/token",
+                "headers": {
+                  "Content-Type": "application/x-www-form-urlencoded"
+                },
+                "body": "grant_type=client_credentials&\nclient_id=cdfb16ec-a0cb-46fc-9fd8-60280661e9b3&\nclient_secret=\nresource=https://management.azure.com/"
+              }
+            },
+            "accesstoken": {
+              "runAfter": {
+                "HTTP-Get-Token": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "5bd4c626-3fc1-4412-870b-9add81faece2"
+              },
+              "type": "Compose",
+              "inputs": "@body('HTTP-Get-Token')?['access_token']"
+            },
+            "HTTP-Get-All-Subscriptions": {
+              "runAfter": {
+                "accesstoken": [
+                  "Succeeded",
+                  "Failed"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "78642929-1c59-4c99-9c1c-6bfa5f8d7d6f"
+              },
+              "type": "Http",
+              "inputs": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions?api-version=2020-01-01",
+                "headers": {
+                  "Authorization": "Bearer @{outputs('accesstoken')}",
+                  "Content-Type": "application/json"
+                }
+              }
+            }
+          },
+          "runAfter": {
+            "Compose": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "febaafd5-767b-4769-ab47-8d0d39b45cde"
+          },
+          "type": "Scope"
+        },
+        "Check-And-Notify-Individual-Subscription": {
+          "actions": {
+            "Parse_JSON": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "7a81108b-5904-4471-ae45-2176c29c3c9c"
+              },
+              "type": "ParseJson",
+              "inputs": {
+                "content": "@body('HTTP-Get-All-Subscriptions')",
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "authorizationSource": {
+                            "type": "string"
+                          },
+                          "managedByTenants": {
+                            "type": "array"
+                          },
+                          "tags": {
+                            "type": "object",
+                            "properties": {
+                              "TTL": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "subscriptionId": {
+                            "type": "string"
+                          },
+                          "tenantId": {
+                            "type": "string"
+                          },
+                          "displayName": {
+                            "type": "string"
+                          },
+                          "state": {
+                            "type": "string"
+                          },
+                          "subscriptionPolicies": {
+                            "type": "object",
+                            "properties": {
+                              "locationPlacementId": {
+                                "type": "string"
+                              },
+                              "quotaId": {
+                                "type": "string"
+                              },
+                              "spendingLimit": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "authorizationSource",
+                          "managedByTenants",
+                          "tags",
+                          "subscriptionId",
+                          "tenantId",
+                          "displayName",
+                          "state",
+                          "subscriptionPolicies"
+                        ]
+                      }
+                    },
+                    "count": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "Apply_to_each_Subscriptions": {
+              "foreach": "@body('Filter-Only-Sanbox-Items')",
+              "actions": {
+                "tags": {
+                  "runAfter": {},
+                  "metadata": {
+                    "operationMetadataId": "3917925b-d302-4683-8adc-91242b85ee3a"
+                  },
+                  "type": "Compose",
+                  "inputs": "@items('Apply_to_each_Subscriptions')?['tags']"
+                },
+                "HTTP-Get-RoleAssignments": {
+                  "runAfter": {
+                    "HTTP-Get-Subscription-Details": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "5cd06505-abda-4c3d-94fd-ecc5f3545555"
+                  },
+                  "type": "Http",
+                  "inputs": {
+                    "method": "GET",
+                    "uri": "https://management.azure.com/subscriptions/@{outputs('subscriptionId')}/providers/Microsoft.Authorization/roleAssignments?api-version=2022-04-01",
+                    "headers": {
+                      "Authorization": "Bearer @{outputs('accesstoken')}",
+                      "Content-Type": "application/json"
+                    }
+                  }
+                },
+                "Filter_array": {
+                  "runAfter": {
+                    "Parse-RoleAssignments-To-JSON_": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "1f45cbe6-a143-447c-a27f-aa1d03be1f5a"
+                  },
+                  "type": "Query",
+                  "inputs": {
+                    "from": "@body('Parse-RoleAssignments-To-JSON_')?['value']",
+                    "where": "@contains(item()?['properties']?['roleDefinitionId'], '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')"
+                  }
+                },
+                "Parse-RoleAssignments-To-JSON_": {
+                  "runAfter": {
+                    "HTTP-Get-RoleAssignments": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "e50660b9-32c0-43d8-98d0-a7b2ed6b7cca"
+                  },
+                  "type": "ParseJson",
+                  "inputs": {
+                    "content": "@body('HTTP-Get-RoleAssignments')",
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "properties": {
+                                "type": "object",
+                                "properties": {
+                                  "roleDefinitionId": {
+                                    "type": "string"
+                                  },
+                                  "principalId": {
+                                    "type": "string"
+                                  },
+                                  "principalType": {
+                                    "type": "string"
+                                  },
+                                  "scope": {
+                                    "type": "string"
+                                  },
+                                  "condition": {},
+                                  "conditionVersion": {},
+                                  "createdOn": {
+                                    "type": "string"
+                                  },
+                                  "updatedOn": {
+                                    "type": "string"
+                                  },
+                                  "createdBy": {
+                                    "type": "string"
+                                  },
+                                  "updatedBy": {
+                                    "type": "string"
+                                  },
+                                  "delegatedManagedIdentityResourceId": {},
+                                  "description": {}
+                                }
+                              },
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "properties",
+                              "id",
+                              "type",
+                              "name"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "HTTP-Get-Subscription-Details": {
+                  "runAfter": {
+                    "Condition-3-Day": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "7a0c380f-c3cf-437e-adf5-9719b82c939e"
+                  },
+                  "type": "Http",
+                  "inputs": {
+                    "method": "GET",
+                    "uri": "https://management.azure.com/subscriptions/@{outputs('subscriptionId')}?api-version=2022-01-01",
+                    "headers": {
+                      "Authorization": "Bearer @{outputs('accesstoken')}",
+                      "Content-Type": "application/json"
+                    }
+                  }
+                },
+                "Apply_to_each": {
+                  "foreach": "@body('Filter_array')",
+                  "actions": {
+                    "principalId": {
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "0664edc8-e1b6-4aec-af96-5d9d0dd676b7"
+                      },
+                      "type": "Compose",
+                      "inputs": "@items('Apply_to_each')?['properties']?['principalId']"
+                    },
+                    "HTTP-Get-RoleAssignments_2": {
+                      "runAfter": {
+                        "graph-token": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "35151da9-199e-4d8b-b70b-d636e4877ea8"
+                      },
+                      "type": "Http",
+                      "inputs": {
+                        "method": "GET",
+                        "uri": "https://graph.microsoft.com/v1.0/directoryObjects/@{outputs('principalId')}",
+                        "headers": {
+                          "Authorization": "Bearer @{outputs('graph-token')}",
+                          "Content-Type": "application/json"
+                        }
+                      }
+                    },
+                    "HTTP-Get-Graph-Token": {
+                      "runAfter": {
+                        "principalId": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "5d1c001d-68ba-4cf7-8145-30697e837be6"
+                      },
+                      "type": "Http",
+                      "inputs": {
+                        "method": "POST",
+                        "uri": "https://login.microsoftonline.com/687f51c3-0c5d-4905-84f8-97c683a5b9d1/oauth2/token",
+                        "headers": {
+                          "Content-Type": "application/x-www-form-urlencoded"
+                        },
+                        "body": "grant_type=client_credentials&\nclient_id=cdfb16ec-a0cb-46fc-9fd8-60280661e9b3&\nclient_secret=***&\nresource=https://graph.microsoft.com/"
+                      }
+                    },
+                    "graph-token": {
+                      "runAfter": {
+                        "HTTP-Get-Graph-Token": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "07fbae96-ea0f-4804-9f47-50cca46e9d7e"
+                      },
+                      "type": "Compose",
+                      "inputs": "@body('HTTP-Get-Graph-Token')?['access_token']"
+                    }
+                  },
+                  "runAfter": {
+                    "Filter_array": [
+                      "TimedOut"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "dace4b90-3f3b-45b7-b534-df1d6b313783"
+                  },
+                  "type": "Foreach"
+                },
+                "tag-Owner": {
+                  "runAfter": {
+                    "tags": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "653f5924-349d-4de6-96de-fbcdf3bb34a7"
+                  },
+                  "type": "Compose",
+                  "inputs": "@items('Apply_to_each_Subscriptions')?['tags']?['Owner']"
+                },
+                "tag-TTL": {
+                  "runAfter": {
+                    "tag-Owner": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "7bed2f2f-53f2-4d87-a5fc-acb2fbb7b2e9"
+                  },
+                  "type": "Compose",
+                  "inputs": "@items('Apply_to_each_Subscriptions')?['tags']?['TTL']"
+                },
+                "Compose–TTL-Plus-10-Days": {
+                  "runAfter": {
+                    "tag-TTL": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "52550bde-59a0-468c-a874-bbc5c60e0262"
+                  },
+                  "type": "Compose",
+                  "inputs": "@formatDateTime(addDays(outputs('tag-TTL'), -10),'yyyy-MM-dd')"
+                },
+                "_Compose-Today-Date": {
+                  "runAfter": {
+                    "Compose–TTL-Plus-10-Days": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "b9b579e5-7de2-47dc-897a-99fe5fbeaf4b"
+                  },
+                  "type": "Compose",
+                  "inputs": "@formatDateTime(utcNow(), 'yyyy-MM-dd')"
+                },
+                "Condition-3-Day": {
+                  "actions": {
+                    "Compose_2": {
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "83a68755-bd66-443a-b452-782ed0d259ab"
+                      },
+                      "type": "Compose",
+                      "inputs": "send notification"
+                    },
+                    "Post_message_in_a_chat_or_channel": {
+                      "runAfter": {
+                        "Compose_2": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "a5560108-c17b-4959-8a1d-8ca6a2eeb143"
+                      },
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connectionName": "shared_teams",
+                          "operationId": "PostMessageToConversation",
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_teams"
+                        },
+                        "parameters": {
+                          "poster": "Flow bot",
+                          "location": "Chat with Flow bot",
+                          "body/recipient": "@{outputs('tag-Owner')};",
+                          "body/messageBody": "<p>Hi User,<br>\n<br>\nyour subscripoint nearing TTL period. after 10 days it will be not availble if you want to extend the period plz log a ticket in SNOW.</p>"
+                        },
+                        "authentication": "@parameters('$authentication')"
+                      }
+                    }
+                  },
+                  "runAfter": {
+                    "subscriptionId": [
+                      "Succeeded"
+                    ]
+                  },
+                  "expression": {
+                    "equals": [
+                      "@outputs('_Compose-Today-Date')",
+                      "@outputs('Compose–TTL-Plus-10-Days')"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "1cfb06a5-bb2e-465f-91ea-374815cae593"
+                  },
+                  "type": "If"
+                },
+                "Condition-0-Day": {
+                  "actions": {
+                    "Compose_3": {
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "83a68755-bd66-443a-b452-782ed0d259ab"
+                      },
+                      "type": "Compose",
+                      "inputs": "send notification"
+                    },
+                    "Post_message_in_a_chat_or_channel_2": {
+                      "runAfter": {
+                        "Compose_3": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "a5560108-c17b-4959-8a1d-8ca6a2eeb143"
+                      },
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connectionName": "shared_teams",
+                          "operationId": "PostMessageToConversation",
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_teams"
+                        },
+                        "parameters": {
+                          "poster": "Flow bot",
+                          "location": "Chat with Flow bot",
+                          "body/recipient": "@{outputs('tag-Owner')};",
+                          "body/messageBody": "<p>Hi User,<br>\n<br>\nyour subscripoint nearing TTL period. after 10 days it will be not availble if you want to extend the period plz log a ticket in SNOW.</p>"
+                        },
+                        "authentication": "@parameters('$authentication')"
+                      }
+                    },
+                    "HTTP-Set-Readonly-RG": {
+                      "runAfter": {
+                        "Post_message_in_a_chat_or_channel_2": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "78642929-1c59-4c99-9c1c-6bfa5f8d7d6f"
+                      },
+                      "type": "Http",
+                      "inputs": {
+                        "method": "PUT",
+                        "uri": "https://management.azure.com/subscriptions/@{outputs('subscriptionId')}/resourceGroups/Sandbox-Resouce-GP-1/providers/Microsoft.Authorization/locks/rg-lock?api-version=2016-09-01",
+                        "headers": {
+                          "Authorization": "Bearer @{outputs('accesstoken')}",
+                          "Content-Type": "application/json"
+                        },
+                        "body": {
+                          "properties": {
+                            "level": "ReadOnly",
+                            "notes": "Resource group is read-only"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "runAfter": {
+                    "subscriptionId": [
+                      "Succeeded"
+                    ]
+                  },
+                  "expression": {
+                    "equals": [
+                      "@outputs('_Compose-Today-Date')",
+                      "@outputs('_Compose-Today-Date')"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "1cfb06a5-bb2e-465f-91ea-374815cae593"
+                  },
+                  "type": "If"
+                },
+                "subscriptionId": {
+                  "runAfter": {
+                    "_Compose-Today-Date": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "193c8376-03f0-47c2-8ae8-38032721026d"
+                  },
+                  "type": "Compose",
+                  "inputs": "@items('Apply_to_each_Subscriptions')?['subscriptionId']"
+                }
+              },
+              "runAfter": {
+                "Filter-Only-Sanbox-Items": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "7544147e-33d9-47a0-97b7-6050028469a6"
+              },
+              "type": "Foreach"
+            },
+            "Filter-Only-Sanbox-Items": {
+              "runAfter": {
+                "Parse_JSON": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "e8291005-3221-4335-8832-977c8d6456d1"
+              },
+              "type": "Query",
+              "inputs": {
+                "from": "@body('Parse_JSON')?['value']",
+                "where": "@equals(item()?['tags']?['Environment'], 'Sandbox')"
+              }
+            }
+          },
+          "runAfter": {
+            "Get-All-Subscriptions": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "546ea8f0-91bc-44e9-8c6d-b796c08f5b93"
+          },
+          "type": "Scope"
+        }
+      }
+    },
+    "templateName": ""
+  },
+  "schemaVersion": "1.0.0.0"
+}
