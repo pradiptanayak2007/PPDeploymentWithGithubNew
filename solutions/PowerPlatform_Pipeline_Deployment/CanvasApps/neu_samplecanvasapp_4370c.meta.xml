@@ -1,17 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <CanvasApp xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Name>neu_samplecanvasapp_4370c</Name>
-  <AppVersion>2026-04-15T16:38:11Z</AppVersion>
+  <AppVersion>2026-04-21T13:09:25Z</AppVersion>
   <Status>Ready</Status>
-  <CreatedByClientVersion>3.26035.13.0</CreatedByClientVersion>
-  <MinClientVersion>3.26035.13.0</MinClientVersion>
-  <Tags>{"primaryDeviceWidth":"1366","primaryDeviceHeight":"768","supportsPortrait":"true","supportsLandscape":"true","primaryFormFactor":"Tablet","showStatusBar":"false","publisherVersion":"3.26035.13","minimumRequiredApiVersion":"2.2.0","hasComponent":"false","hasUnlockedComponent":"false","isUnifiedRootApp":"false","m365CopilotSettingValue":"0","sienaVersion":"20260415T092809Z-3.26035.13.0"}</Tags>
+  <CreatedByClientVersion>3.26041.15.0</CreatedByClientVersion>
+  <MinClientVersion>3.26041.15.0</MinClientVersion>
+  <Tags>{"primaryDeviceWidth":"1366","primaryDeviceHeight":"768","supportsPortrait":"true","supportsLandscape":"true","primaryFormFactor":"Tablet","showStatusBar":"false","publisherVersion":"3.26041.15","minimumRequiredApiVersion":"2.2.0","hasComponent":"false","hasUnlockedComponent":"false","isUnifiedRootApp":"false","m365CopilotSettingValue":"0","sienaVersion":"20260415T163811Z-3.26035.13.0"}</Tags>
   <IsCdsUpgraded>0</IsCdsUpgraded>
   <GalleryItemId xsi:nil="true"></GalleryItemId>
   <BackgroundColor>RGBA(0,176,240,1)</BackgroundColor>
   <DisplayName>SampleCanvasApp</DisplayName>
   <Description xsi:nil="true"></Description>
-  <CommitMessage>update with new change to test PR</CommitMessage>
+  <CommitMessage>let check</CommitMessage>
   <Publisher xsi:nil="true"></Publisher>
   <AuthorizationReferences>[]</AuthorizationReferences>
   <ConnectionReferences>{}</ConnectionReferences>
