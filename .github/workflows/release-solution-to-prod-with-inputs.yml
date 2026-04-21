@@ -61,6 +61,10 @@ jobs:
       with:
         lfs: true
 
+    - name: Install Power Platform CLI
+      uses: microsoft/powerplatform-actions/actions-install@v1
+
+
     - name: Pack solution
       uses: microsoft/powerplatform-actions/pack-solution@v1
       with:
