@@ -12,7 +12,7 @@ jobs:
     uses: ./.github/workflows/release-solution-to-prod-with-inputs.yml
     with:
       #You can specify the solution name here
-      solution_name: ALMLab
+      solution_name: PowerPlatform_Pipeline_Deployment
       #Update your values here
       BUILD_ENVIRONMENT_URL: ${{vars.BUILD_ENVIRONMENT_URL}}
       PRODUCTION_ENVIRONMENT_URL: ${{vars.PROD_ENVIRONMENT_URL}}
