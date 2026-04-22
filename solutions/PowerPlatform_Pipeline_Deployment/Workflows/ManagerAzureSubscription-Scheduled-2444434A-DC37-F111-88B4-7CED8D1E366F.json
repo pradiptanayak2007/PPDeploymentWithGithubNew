@@ -9,6 +9,15 @@
         "api": {
           "name": "shared_teams"
         }
+      },
+      "shared_commondataserviceforapps": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "neu_sharedcommondataserviceforapps_9e205"
+        },
+        "api": {
+          "name": "shared_commondataserviceforapps"
+        }
       }
     },
     "definition": {
@@ -44,12 +53,16 @@
       },
       "actions": {
         "Compose": {
-          "runAfter": {},
+          "runAfter": {
+            "Perform-an-unbound-action": [
+              "Succeeded"
+            ]
+          },
           "metadata": {
             "operationMetadataId": "e71848d0-c910-4e36-b4ca-9cab2a39f03d"
           },
           "type": "Compose",
-          "inputs": "Job Started"
+          "inputs": "1. @{outputs('Perform-an-unbound-action')?['body/EnvironmentVariableSecretValue']}\n2. @{body('Perform-an-unbound-action')}"
         },
         "Get-All-Subscriptions": {
           "actions": {
@@ -65,7 +78,7 @@
                 "headers": {
                   "Content-Type": "application/x-www-form-urlencoded"
                 },
-                "body": "grant_type=client_credentials&\nclient_id=cdfb16ec-a0cb-46fc-9fd8-60280661e9b3&\nclient_secret=\nresource=https://management.azure.com/"
+                "body": "grant_type=client_credentials&\nclient_id=cdfb16ec-a0cb-46fc-9fd8-60280661e9b3&\nclient_secret=@{outputs('Perform-an-unbound-action')?['body/EnvironmentVariableSecretValue']}&\nresource=https://management.azure.com/"
               }
             },
             "accesstoken": {
@@ -637,6 +650,32 @@
             "operationMetadataId": "546ea8f0-91bc-44e9-8c6d-b796c08f5b93"
           },
           "type": "Scope"
+        },
+        "Perform-an-unbound-action": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "36f4c955-292f-49e9-91c6-c42103035f13"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "PerformUnboundAction",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+            },
+            "parameters": {
+              "actionName": "RetrieveEnvironmentVariableSecretValue",
+              "item/EnvironmentVariableName": "neu_azkeyvaultspnsecret"
+            },
+            "authentication": "@parameters('$authentication')"
+          },
+          "runtimeConfiguration": {
+            "secureData": {
+              "properties": [
+                "outputs"
+              ]
+            }
+          }
         }
       }
     },
