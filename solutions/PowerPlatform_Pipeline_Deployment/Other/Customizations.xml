@@ -13,6 +13,14 @@
   <EntityDataProviders />
   <CanvasApps />
   <connectionreferences>
+    <connectionreference connectionreferencelogicalname="neu_sharedcommondataserviceforapps_9e205">
+      <connectionreferencedisplayname>Microsoft Dataverse PowerPlatform_Pipeline_Deployment-9e205</connectionreferencedisplayname>
+      <connectorid>/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps</connectorid>
+      <iscustomizable>1</iscustomizable>
+      <promptingbehavior>0</promptingbehavior>
+      <statecode>0</statecode>
+      <statuscode>1</statuscode>
+    </connectionreference>
     <connectionreference connectionreferencelogicalname="neu_sharedteams_3de3f">
       <connectionreferencedisplayname>Microsoft Teams PowerPlatform_Pipeline_Deployment-3de3f</connectionreferencedisplayname>
       <connectorid>/providers/Microsoft.PowerApps/apis/shared_teams</connectorid>

@@ -1,0 +1,14 @@
+<environmentvariabledefinition schemaname="neu_azkeyvaultspnsecret">
+  <defaultvalue>/subscriptions/6e3ea17b-2afc-4119-add5-3484ddcf284e/resourceGroups/PowerPlatform-400-RG/providers/Microsoft.KeyVault/vaults/sampleKeyVault1234/secrets/SecretForPowerAutomateToConnectSPN</defaultvalue>
+  <description default="az-key-vault-spn-secret">
+    <label description="az-key-vault-spn-secret" languagecode="1033" />
+  </description>
+  <displayname default="az-key-vault-spn-secret">
+    <label description="az-key-vault-spn-secret" languagecode="1033" />
+  </displayname>
+  <introducedversion>1.0.0.15</introducedversion>
+  <iscustomizable>1</iscustomizable>
+  <isrequired>0</isrequired>
+  <secretstore>0</secretstore>
+  <type>100000005</type>
+</environmentvariabledefinition>
