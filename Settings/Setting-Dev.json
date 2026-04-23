@@ -3,10 +3,6 @@
     {
       "SchemaName": "neu_BaseUrl",
       "Value": "https://github.com/pradiptanayak2007"
-    },
-     {
-      "SchemaName": "neu_azkeyvaultspnsecret",
-      "Value": ""
     }
   ],
   "ConnectionReferences": [
