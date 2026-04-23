@@ -8,7 +8,11 @@
   "ConnectionReferences": [
     {
       "LogicalName": "neu_sharedteams_3de3f",
-      "ConnectionId": "/providers/Microsoft.PowerApps/apis/shared_teams/connections/cf1e500401d1490bbcb619c17486df08",
-      "ConnectorId": "/providers/Microsoft.PowerApps/apis/shared_teams"
-    }]
+      "ConnectionId": "/providers/Microsoft.PowerApps/apis/shared_teams/connections/cf1e500401d1490bbcb619c17486df08"
+    },
+    {
+      "LogicalName": "neu_sharedcommondataserviceforapps_9e205",
+      "ConnectionId": "0a0e63aeecf545769a46a070b3bd222d"
+    }
+  ]
 }
