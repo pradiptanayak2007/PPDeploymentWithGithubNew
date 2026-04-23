@@ -6,7 +6,7 @@
     },
      {
       "SchemaName": "neu_azkeyvaultspnsecret",
-      "Value": "/subscriptions/6e3ea17b-2afc-4119-add5-3484ddcf284e/resourceGroups/PowerPlatform-400-RG/providers/Microsoft.KeyVault/vaults/sampleKeyVault1234/secrets/SecretForPowerAutomateToConnectSPN"
+      "Value": ""
     }
   ],
   "ConnectionReferences": [
