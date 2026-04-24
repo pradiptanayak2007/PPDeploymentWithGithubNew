@@ -12,13 +12,11 @@
   "ConnectionReferences": [
     {
       "LogicalName": "neu_sharedteams_3de3f",
-      "ConnectionId": "cf1e500401d1490bbcb619c17486df08",
-       "ConnectorId": "/providers/Microsoft.PowerApps/apis/shared_teams"
+      "ConnectionId": "cf1e500401d1490bbcb619c17486df08"
     },
     {
       "LogicalName": "neu_sharedcommondataserviceforapps_9e205",
-      "ConnectionId": "0a0e63aeecf545769a46a070b3bd222d",
-      "ConnectorId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+      "ConnectionId": "0a0e63aeecf545769a46a070b3bd222d"
     }
   ]
 }
